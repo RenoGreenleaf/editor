@@ -1,4 +1,5 @@
 import PyQt6.QtWidgets as widgets
+from option import Option
 
 
 class Window(widgets.QMainWindow):
@@ -9,9 +10,8 @@ class Window(widgets.QMainWindow):
 		options_layout = widgets.QVBoxLayout(options)
 
 		for i in range(10):
-			option = widgets.QGroupBox()
-			option_layout = widgets.QVBoxLayout(option)
-			option_layout.addWidget(widgets.QLineEdit())
+			option = Option()
+			option.build()
 			options_layout.addWidget(option)
 
 		scroller = widgets.QScrollArea()
