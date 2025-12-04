@@ -1,4 +1,4 @@
-import PyQt6.QtWidgets as widgets
+from PyQt6 import QtWidgets as widgets, QtGui as gui
 from option import Option
 
 
@@ -6,18 +6,29 @@ class Window(widgets.QMainWindow):
 	"""An app needs a main window."""
 
 	def build(self):
-		options = widgets.QWidget()
-		options_layout = widgets.QVBoxLayout(options)
+		self.setFixedHeight(600)
+		self.setFixedWidth(800)
 
-		for i in range(10):
-			option = Option()
-			option.build()
-			options_layout.addWidget(option)
+		options = widgets.QWidget()
+		self.options_layout = widgets.QVBoxLayout(options)
 
 		scroller = widgets.QScrollArea()
+		scroller.setWidgetResizable(True)
 		scroller.setWidget(options)
 
 		root = widgets.QWidget()
 		root_layout = widgets.QVBoxLayout(root)
 		root_layout.addWidget(scroller)
 		self.setCentralWidget(root)
+
+		toolbar = widgets.QToolBar()
+		self.addToolBar(toolbar)
+
+		add = gui.QAction("Add", self)
+		add.triggered.connect(self.add)
+		toolbar.addAction(add)
+
+	def add(self):
+		option = Option()
+		option.build()
+		self.options_layout.addWidget(option)
