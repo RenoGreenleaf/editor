@@ -10,3 +10,7 @@ class Option(widgets.QGroupBox):
 		layout.addWidget(widgets.QTextEdit())
 		layout.addWidget(widgets.QCheckBox("Hidden"))
 		layout.addWidget(widgets.QCheckBox("Permanent"))
+
+		delete = widgets.QPushButton("Delete")
+		delete.clicked.connect(self.deleteLater)
+		layout.addWidget(delete)
