@@ -5,6 +5,10 @@ from option import Option
 class Window(widgets.QMainWindow):
 	"""An app needs a main window."""
 
+	def __init__(self):
+		self.last_id = 0
+		super().__init__()
+
 	def build(self):
 		self.setFixedHeight(600)
 		self.setFixedWidth(800)
@@ -32,3 +36,6 @@ class Window(widgets.QMainWindow):
 		option = Option()
 		option.build()
 		self.options_layout.addWidget(option)
+
+		self.last_id += 1
+		option.setObjectName(str(self.last_id))
