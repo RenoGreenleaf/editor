@@ -30,7 +30,10 @@ class Window(widgets.QMainWindow):
 
 		add = gui.QAction("Add", self)
 		add.triggered.connect(self.add)
+		save = gui.QAction("Save", self)
+		save.triggered.connect(self.save)
 		toolbar.addAction(add)
+		toolbar.addAction(save)
 
 	def add(self):
 		option = Option()
@@ -39,3 +42,9 @@ class Window(widgets.QMainWindow):
 
 		self.last_id += 1
 		option.setObjectName(str(self.last_id))
+
+	def save(self):
+		path, _ = widgets.QFileDialog.getSaveFileName(self)
+
+		with open(path, 'w') as _:
+			pass
