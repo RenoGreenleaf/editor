@@ -1,3 +1,4 @@
+import json
 from PyQt6 import QtWidgets as widgets, QtGui as gui
 from option import Option
 
@@ -46,5 +47,15 @@ class Window(widgets.QMainWindow):
 	def save(self):
 		path, _ = widgets.QFileDialog.getSaveFileName(self)
 
-		with open(path, 'w') as _:
-			pass
+		with open(path, 'w') as world_file:
+			json.dump(self.normalize(), world_file, indent=4)
+
+	def normalize(self):
+		options = self.findChildren((Option,))
+
+		normalized = {
+			option.objectName(): option.normalize()
+			for option in options
+		}
+
+		return {'available': normalized}

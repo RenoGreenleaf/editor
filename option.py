@@ -6,11 +6,26 @@ class Option(widgets.QGroupBox):
 
 	def build(self):
 		layout = widgets.QVBoxLayout(self)
-		layout.addWidget(widgets.QLineEdit())
-		layout.addWidget(widgets.QTextEdit())
-		layout.addWidget(widgets.QCheckBox("Hidden"))
-		layout.addWidget(widgets.QCheckBox("Permanent"))
+
+		fields = {
+			'description': widgets.QLineEdit(),
+			'message': widgets.QTextEdit(),
+			'hidden': widgets.QCheckBox("Hidden"),
+			'permanent': widgets.QCheckBox("Permanent"),
+		}
+
+		for name, field in fields.items():
+			field.setObjectName(name)
+			layout.addWidget(field)
 
 		delete = widgets.QPushButton("Delete")
 		delete.clicked.connect(self.deleteLater)
 		layout.addWidget(delete)
+
+	def normalize(self):
+		return {
+			'description': self.findChild(widgets.QLineEdit, 'description').text(),
+			'message': self.findChild(widgets.QTextEdit, 'message').toPlainText(),
+			'hidden': self.findChild(widgets.QCheckBox, 'hidden').isChecked(),
+			'permanent': self.findChild(widgets.QCheckBox, 'permanent').isChecked(),
+		}

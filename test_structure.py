@@ -1,7 +1,7 @@
 """Making sure widgets are ready to be mapped to JSON data."""
 import tempfile
 import os
-from PyQt6.QtWidgets import QFileDialog
+from PyQt6 import QtWidgets as widgets
 from window import Window
 from option import Option
 
@@ -26,10 +26,38 @@ def test_saving(qtbot, monkeypatch, tmp_path):
 	def mock_save_dialog(*args, **kwargs):
 		return (path, 'JSON files (*.json)')
 
-	monkeypatch.setattr(QFileDialog, 'getSaveFileName', mock_save_dialog)
+	monkeypatch.setattr(
+		widgets.QFileDialog,
+		'getSaveFileName',
+		mock_save_dialog
+	)
 	window = Window()
 	window.build()
 
 	window.save()
 
 	assert os.path.isfile(path)
+
+
+def test_normalization(qtbot):
+	expected_option = {
+		'description': "Test description.",
+		'message': "Test message.",
+		'permanent': False,
+		'hidden': False
+	}
+	expected_structure = {
+		'available': {
+			'1': expected_option
+		}
+	}
+	window = Window()
+	window.build()
+	window.add()
+	option = window.findChild((Option,))
+	option.findChild((widgets.QLineEdit,)).setText("Test description.")
+	option.findChild((widgets.QTextEdit,)).setText("Test message.")
+
+	result = window.normalize()
+
+	assert result == expected_structure
