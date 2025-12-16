@@ -61,3 +61,32 @@ def test_normalization(qtbot):
 	result = window.normalize()
 
 	assert result == expected_structure
+
+
+def test_denormalization(qtbot):
+	normalized_option = {
+		'description': "Test description.",
+		'message': "Test message.",
+		'permanent': True,
+		'hidden': True
+	}
+	normalized_structure = {
+		'available': {
+			'1': normalized_option
+		}
+	}
+	window = Window()
+	window.build()
+
+	window.denormalize(normalized_structure)
+
+	option = window.findChild((Option,))
+	description = option.findChild((widgets.QLineEdit,), 'description').text()
+	message = option.findChild((widgets.QTextEdit,), 'message').toPlainText()
+	permanent = option.findChild((widgets.QCheckBox,), 'permanent').isChecked()
+	hidden = option.findChild((widgets.QCheckBox,), 'hidden').isChecked()
+	assert description == "Test description."
+	assert message == "Test message."
+	assert permanent
+	assert hidden
+	assert option.objectName() == '1'

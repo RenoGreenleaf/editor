@@ -29,3 +29,12 @@ class Option(widgets.QGroupBox):
 			'hidden': self.findChild(widgets.QCheckBox, 'hidden').isChecked(),
 			'permanent': self.findChild(widgets.QCheckBox, 'permanent').isChecked(),
 		}
+
+	def denormalize(self, raw):
+		self._get('description').setText(raw['description'])
+		self._get('message').setPlainText(raw['message'])
+		self._get('permanent').setChecked(raw['permanent'])
+		self._get('hidden').setChecked(raw['hidden'])
+
+	def _get(self, name):
+		return self.findChild((widgets.QWidget,), name)

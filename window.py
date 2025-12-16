@@ -33,8 +33,11 @@ class Window(widgets.QMainWindow):
 		add.triggered.connect(self.add)
 		save = gui.QAction("Save", self)
 		save.triggered.connect(self.save)
+		load = gui.QAction("Load", self)
+		load.triggered.connect(self.load)
 		toolbar.addAction(add)
 		toolbar.addAction(save)
+		toolbar.addAction(load)
 
 	def add(self):
 		option = Option()
@@ -50,6 +53,12 @@ class Window(widgets.QMainWindow):
 		with open(path, 'w') as world_file:
 			json.dump(self.normalize(), world_file, indent=4)
 
+	def load(self):
+		path, _ = widgets.QFileDialog.getOpenFileName(self)
+
+		with open(path, 'r') as world_file:
+			self.denormalize(json.load(world_file))
+
 	def normalize(self):
 		options = self.findChildren((Option,))
 
@@ -59,3 +68,13 @@ class Window(widgets.QMainWindow):
 		}
 
 		return {'available': normalized}
+
+	def denormalize(self, raw_world):
+		for name, raw_option in raw_world['available'].items():
+			option = Option()
+			option.build()
+			option.denormalize(raw_option)
+			option.setObjectName(name)
+			self.options_layout.addWidget(option)
+
+		self.last_id = int(max(raw_world['available'].keys()))
