@@ -1,7 +1,8 @@
 import json
-from PyQt6 import QtWidgets as widgets, QtGui as gui
+import qtpynodeeditor as ne
+from qtpy import QtWidgets as widgets, QtGui as gui
 from option import Option
-
+import nodes
 
 class Window(widgets.QMainWindow):
 	"""An app needs a main window."""
@@ -22,11 +23,19 @@ class Window(widgets.QMainWindow):
 		scroller.setWidget(options)
 
 		root = widgets.QWidget()
-		root_layout = widgets.QVBoxLayout(root)
+		root_layout = widgets.QHBoxLayout(root)
+
+		registry = ne.DataModelRegistry()
+		registry.register_model(nodes.Option)
+		scene = ne.FlowScene(registry=registry)
+		flow = ne.FlowView(scene)
+
 		root_layout.addWidget(scroller)
+		root_layout.addWidget(flow)
 		self.setCentralWidget(root)
 
 		toolbar = widgets.QToolBar()
+		toolbar.setMovable(False)
 		self.addToolBar(toolbar)
 
 		add = gui.QAction("Add", self)

@@ -1,4 +1,4 @@
-import PyQt6.QtWidgets as widgets
+import qtpy.QtWidgets as widgets
 
 
 class Option(widgets.QGroupBox):

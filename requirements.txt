@@ -1,2 +1,4 @@
 PyQt6 == 6.10.0
+qtpy
 pytest-qt == 4.5.0
+qtpynodeeditor[pyqt6]
