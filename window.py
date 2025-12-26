@@ -64,6 +64,10 @@ class Window(widgets.QMainWindow):
 
 	def load(self):
 		path, _ = widgets.QFileDialog.getOpenFileName(self)
+		options = self.findChildren((Option,))
+
+		for option in options:
+			option.deleteLater()
 
 		with open(path, 'r') as world_file:
 			self.denormalize(json.load(world_file))
