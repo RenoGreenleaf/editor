@@ -1,4 +1,4 @@
-import qtpy.QtWidgets as widgets
+from qtpy import QtWidgets as widgets, QtCore as core, QtGui as gui
 
 
 class Option(widgets.QGroupBox):
@@ -21,6 +21,16 @@ class Option(widgets.QGroupBox):
 		delete = widgets.QPushButton("Delete")
 		delete.clicked.connect(self.deleteLater)
 		layout.addWidget(delete)
+
+	def mouseMoveEvent(self, event):
+		if event.buttons() == core.Qt.LeftButton:
+			pixmap = self.grab()
+			drag = gui.QDrag(self)
+			mime = core.QMimeData()
+			drag.setMimeData(mime)
+			drag.setPixmap(pixmap)
+			drag.setHotSpot(event.pos())
+			drag.exec()
 
 	def normalize(self):
 		return {
