@@ -19,3 +19,14 @@ class Option(ne.NodeDataModel):
 		ne.PortType.output: 1,
 	}
 	data_type = Boolean.data_type
+
+
+class Scene(ne.FlowScene):
+	"""Things can be dropped here."""
+
+	def dragMoveEvent(self, event):
+		event.acceptProposedAction()
+
+	def dropEvent(self, event):
+		node = self.create_node(Option)
+		node.graphics_object.setPos(event.scenePos())

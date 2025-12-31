@@ -4,6 +4,7 @@ from qtpy import QtWidgets as widgets, QtGui as gui
 from option import Option
 import nodes
 
+
 class Window(widgets.QMainWindow):
 	"""An app needs a main window."""
 
@@ -27,8 +28,9 @@ class Window(widgets.QMainWindow):
 
 		registry = ne.DataModelRegistry()
 		registry.register_model(nodes.Option)
-		scene = ne.FlowScene(registry=registry)
+		scene = nodes.Scene(registry=registry)
 		flow = ne.FlowView(scene)
+		flow.setAcceptDrops(True)
 
 		root_layout.addWidget(scroller)
 		root_layout.addWidget(flow)
