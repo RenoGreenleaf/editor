@@ -10,6 +10,7 @@ class Window(widgets.QMainWindow):
 
 	def __init__(self):
 		self.last_id = 0
+		self.options_layout = widgets.QVBoxLayout()
 		super().__init__()
 
 	def build(self):
@@ -17,7 +18,7 @@ class Window(widgets.QMainWindow):
 		self.setFixedWidth(800)
 
 		options = widgets.QWidget()
-		self.options_layout = widgets.QVBoxLayout(options)
+		options.setLayout(self.options_layout)
 
 		scroller = widgets.QScrollArea()
 		scroller.setWidgetResizable(True)

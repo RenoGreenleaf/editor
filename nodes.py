@@ -1,11 +1,19 @@
+"""Node editor stuff."""
+
+from qtpy.QtWidgets import QWidget, QLineEdit
+from qtpy.QtGui import QMouseEvent
 import qtpynodeeditor as ne
 
 
 class Boolean(ne.NodeData):
+	"""Required for a node."""
+
 	data_type = ne.NodeDataType('boolean', 'Boolean')
 
 
 class Option(ne.NodeDataModel):
+	"""A node corresponding to an option widget."""
+
 	name = 'option'
 	port_caption_visible = True
 	port_caption = {
@@ -20,13 +28,28 @@ class Option(ne.NodeDataModel):
 	}
 	data_type = Boolean.data_type
 
+	def __init__(self, *args, **kwargs):
+		"""Declare custom properties."""
+		super().__init__(*args, **kwargs)
+		self.widget = QWidget()
+
+	def setCaption(self, text):
+		"""Synchronize widgets description with node caption."""
+		self.caption = text
+
 
 class Scene(ne.FlowScene):
-	"""Things can be dropped here."""
+	"""Node editor itself."""
 
 	def dragMoveEvent(self, event):
+		"""Accept event. Required for a drag-drop event to work."""
 		event.acceptProposedAction()
 
 	def dropEvent(self, event):
-		node = self.create_node(Option)
+		"""Happens when a widget is dropped on the editor."""
+		node = self.create_node(Option())
 		node.graphics_object.setPos(event.scenePos())
+		option = event.source()
+		description = option.findChild((QLineEdit,))
+		node.model.setCaption(description.text())
+		description.textChanged.connect(node.model.setCaption)
