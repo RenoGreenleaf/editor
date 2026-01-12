@@ -36,6 +36,9 @@ class Option(ne.NodeDataModel):
 	def setCaption(self, text):
 		"""Synchronize widgets description with node caption."""
 		self.caption = text
+		# ne.NodeGraphicsObject().focus
+		self.graphics_object.setFocus()
+		self.graphics_object.clearFocus()
 
 
 class Scene(ne.FlowScene):
@@ -51,5 +54,6 @@ class Scene(ne.FlowScene):
 		node.graphics_object.setPos(event.scenePos())
 		option = event.source()
 		description = option.findChild((QLineEdit,))
+		node.model.graphics_object = node.graphics_object
 		node.model.setCaption(description.text())
 		description.textChanged.connect(node.model.setCaption)
