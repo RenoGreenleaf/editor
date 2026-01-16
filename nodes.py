@@ -1,7 +1,6 @@
 """Node editor stuff."""
 
-from qtpy.QtWidgets import QWidget, QLineEdit
-from qtpy.QtGui import QMouseEvent
+from qtpy.QtWidgets import QWidget, QLineEdit, QToolTip, QMessageBox
 import qtpynodeeditor as ne
 
 
@@ -36,7 +35,6 @@ class Option(ne.NodeDataModel):
 	def setCaption(self, text):
 		"""Synchronize widgets description with node caption."""
 		self.caption = text
-		# ne.NodeGraphicsObject().focus
 		self.graphics_object.setFocus()
 		self.graphics_object.clearFocus()
 
@@ -50,10 +48,20 @@ class Scene(ne.FlowScene):
 
 	def dropEvent(self, event):
 		"""Happens when a widget is dropped on the editor."""
+		widget = event.source()
+		if widget in self._iterate_over_widgets():
+			QMessageBox.information(widget, " ", "It's dropped already.")
+			return
+
+		# node creation
 		node = self.create_node(Option())
 		node.graphics_object.setPos(event.scenePos())
-		option = event.source()
-		description = option.findChild((QLineEdit,))
 		node.model.graphics_object = node.graphics_object
+		description = widget.findChild((QLineEdit,))
+		node.model.widget = widget
 		node.model.setCaption(description.text())
 		description.textChanged.connect(node.model.setCaption)
+
+	def _iterate_over_widgets(self):
+		for node in self.iterate_over_node_data():
+			yield node.widget
