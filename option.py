@@ -1,3 +1,4 @@
+"""A widget representing a conversation option."""
 from qtpy import QtWidgets as widgets, QtCore as core, QtGui as gui
 
 
@@ -5,6 +6,7 @@ class Option(widgets.QGroupBox):
 	"""Groups parts of an option."""
 
 	def build(self):
+		"""Prepare base layout. Call it right after instantiation."""
 		layout = widgets.QVBoxLayout(self)
 
 		fields = {
@@ -23,6 +25,7 @@ class Option(widgets.QGroupBox):
 		layout.addWidget(delete)
 
 	def mouseMoveEvent(self, event):
+		"""Drag to make a node."""
 		if event.buttons() == core.Qt.LeftButton:
 			pixmap = self.grab()
 			drag = gui.QDrag(self)
@@ -33,6 +36,7 @@ class Option(widgets.QGroupBox):
 			drag.exec()
 
 	def normalize(self):
+		"""Prepare for saving."""
 		return {
 			'description': self.findChild(widgets.QLineEdit, 'description').text(),
 			'message': self.findChild(widgets.QTextEdit, 'message').toPlainText(),
@@ -41,6 +45,7 @@ class Option(widgets.QGroupBox):
 		}
 
 	def denormalize(self, raw):
+		"""Load."""
 		self._get('description').setText(raw['description'])
 		self._get('message').setPlainText(raw['message'])
 		self._get('permanent').setChecked(raw['permanent'])

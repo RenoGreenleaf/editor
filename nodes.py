@@ -1,6 +1,5 @@
 """Node editor stuff."""
-
-from qtpy.QtWidgets import QWidget, QLineEdit, QToolTip, QMessageBox
+from qtpy.QtWidgets import QWidget, QLineEdit, QMessageBox
 import qtpynodeeditor as ne
 
 
@@ -62,6 +61,35 @@ class Scene(ne.FlowScene):
 		node.model.setCaption(description.text())
 		description.textChanged.connect(node.model.setCaption)
 
+
+		for c in self._iterate_over_connections():
+			print(c.input_node)
+			print(c.output_node)
+			print(c.ports)
+
+	def normalize(self):
+		"""Prepare for saving."""
+		result = []
+
+		for connection in self._iterate_over_connections():
+			result.append(self._normalize_connection(connection))
+
+		return result
+
+	def _normalize_connection(self, connection):
+		input_, _ = connection.ports
+
+		return {
+			'trigger': connection.output_node.model.widget.objectName(),
+			'affected': connection.input_node.model.widget.objectName(),
+			'action': 'show' if input_.index == 1 else 'hide',
+		}
+
 	def _iterate_over_widgets(self):
 		for node in self.iterate_over_node_data():
 			yield node.widget
+
+	def _iterate_over_connections(self):
+		for node in self.iterate_over_nodes():
+			for connection in node.state.output_connections:
+				yield connection

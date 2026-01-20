@@ -1,3 +1,4 @@
+"""Root widget."""
 import json
 import qtpynodeeditor as ne
 from qtpy import QtWidgets as widgets, QtGui as gui
@@ -9,11 +10,13 @@ class Window(widgets.QMainWindow):
 	"""An app needs a main window."""
 
 	def __init__(self):
+		"""Define initial properties to be sure they're available later."""
 		self.last_id = 0
 		self.options_layout = widgets.QVBoxLayout()
 		super().__init__()
 
 	def build(self):
+		"""Prepare base layout. Call it right after instantiation."""
 		self.setFixedHeight(600)
 		self.setFixedWidth(800)
 
@@ -52,6 +55,7 @@ class Window(widgets.QMainWindow):
 		toolbar.addAction(load)
 
 	def add(self):
+		"""Add option. Called via UI."""
 		option = Option()
 		option.build()
 		self.options_layout.addWidget(option)
@@ -60,32 +64,39 @@ class Window(widgets.QMainWindow):
 		option.setObjectName(str(self.last_id))
 
 	def save(self):
+		"""Preserve current state to a file."""
 		path, _ = widgets.QFileDialog.getSaveFileName(self)
 
-		with open(path, 'w') as world_file:
+		with open(path, 'w', encoding='utf-8') as world_file:
 			json.dump(self.normalize(), world_file, indent=4)
 
 	def load(self):
+		"""Restore state from a file."""
 		path, _ = widgets.QFileDialog.getOpenFileName(self)
 		options = self.findChildren((Option,))
 
 		for option in options:
 			option.deleteLater()
 
-		with open(path, 'r') as world_file:
+		with open(path, 'r', encoding='utf-8') as world_file:
 			self.denormalize(json.load(world_file))
 
 	def normalize(self):
+		"""Prepare raw data for saving."""
 		options = self.findChildren((Option,))
-
-		normalized = {
+		normalized_options = {
 			option.objectName(): option.normalize()
 			for option in options
 		}
 
-		return {'available': normalized}
+		view = self.findChild((ne.FlowView,))
+		return {
+			'ai': view.scene.normalize(),
+			'available': normalized_options,
+		}
 
 	def denormalize(self, raw_world):
+		"""Fill a window from raw data."""
 		for name, raw_option in raw_world['available'].items():
 			option = Option()
 			option.build()
