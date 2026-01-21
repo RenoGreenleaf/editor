@@ -49,6 +49,7 @@ class Scene(ne.FlowScene):
 	def dropEvent(self, event):
 		"""Happens when a widget is dropped on the editor."""
 		widget = event.source()
+
 		if widget in self._iterate_over_widgets():
 			QMessageBox.information(widget, " ", "It's dropped already.")
 			return
@@ -61,12 +62,6 @@ class Scene(ne.FlowScene):
 		node.model.widget = widget
 		node.model.setCaption(description.text())
 		description.textChanged.connect(node.model.setCaption)
-
-
-		for c in self._iterate_over_connections():
-			print(c.input_node)
-			print(c.output_node)
-			print(c.ports)
 
 	def normalize(self):
 		"""Prepare for saving."""
