@@ -1,3 +1,4 @@
+# Copyright (C) 2026  Reno Greenleaf
 """A widget representing a conversation option."""
 from qtpy import QtWidgets as widgets, QtCore as core, QtGui as gui
 

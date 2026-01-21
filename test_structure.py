@@ -1,3 +1,4 @@
+# Copyright (C) 2026  Reno Greenleaf
 """Making sure widgets are ready to be mapped to JSON data."""
 import tempfile
 import os

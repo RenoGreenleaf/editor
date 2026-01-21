@@ -1,3 +1,4 @@
+# Copyright (C) 2026  Reno Greenleaf
 """Root widget."""
 import json
 import qtpynodeeditor as ne

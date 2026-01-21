@@ -1,3 +1,4 @@
+# Copyright (C) 2026  Reno Greenleaf
 """Node editor stuff."""
 from qtpy.QtWidgets import QWidget, QLineEdit, QMessageBox
 import qtpynodeeditor as ne

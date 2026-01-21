@@ -1,3 +1,4 @@
+# Copyright (C) 2026  Reno Greenleaf
 from qtpy.QtWidgets import QApplication
 from window import Window
 from sys import argv
