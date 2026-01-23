@@ -1,7 +1,8 @@
 # Copyright (C) 2026  Reno Greenleaf
 """Node editor stuff."""
-from qtpy.QtWidgets import QWidget, QLineEdit, QMessageBox
+from qtpy.QtWidgets import QWidget, QLineEdit, QMessageBox, QPushButton
 import qtpynodeeditor as ne
+from option import Option as Widget
 
 
 class Boolean(ne.NodeData):
@@ -31,12 +32,18 @@ class Option(ne.NodeDataModel):
 		"""Declare custom properties."""
 		super().__init__(*args, **kwargs)
 		self.widget = QWidget()
+		self.node = ne.Node(self)
+		registry = ne.DataModelRegistry()
+		self.scene = ne.FlowScene(registry=registry)
 
 	def setCaption(self, text):
 		"""Synchronize widgets description with node caption."""
 		self.caption = text
 		self.graphics_object.setFocus()
 		self.graphics_object.clearFocus()
+
+	def delete(self):
+		self.scene.remove_node(self.node)
 
 
 class Scene(ne.FlowScene):
@@ -54,14 +61,19 @@ class Scene(ne.FlowScene):
 			QMessageBox.information(widget, " ", "It's dropped already.")
 			return
 
-		# node creation
 		node = self.create_node(Option())
-		node.graphics_object.setPos(event.scenePos())
-		node.model.graphics_object = node.graphics_object
-		description = widget.findChild((QLineEdit,))
+		node.model.node = node
+		node.model.scene = self
 		node.model.widget = widget
-		node.model.setCaption(description.text())
+		node.model.graphics_object = node.graphics_object
+
+		delete = widget.findChild((QPushButton,))
+		description = widget.findChild((QLineEdit,))
 		description.textChanged.connect(node.model.setCaption)
+		delete.clicked.connect(node.model.delete)
+
+		node.graphics_object.setPos(event.scenePos())
+		node.model.setCaption(description.text())
 
 	def normalize(self):
 		"""Prepare for saving."""
