@@ -105,4 +105,17 @@ class Window(widgets.QMainWindow):
 			option.setObjectName(name)
 			self.options_layout.addWidget(option)
 
+		view = self.findChild((ne.FlowView,))
+		view.scene.denormalize(raw_world, self)
+
 		self.last_id = int(max(raw_world['available'].keys()))
+
+	def get(self, key, identifier):
+		"""Retrieve a widget to create a node from it."""
+		if key != 'option':
+			raise KeyError()
+
+		return self.findChild((Option,), identifier)
+
+	def unid(self):
+		"""Implement relationships interface."""

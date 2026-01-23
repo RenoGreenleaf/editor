@@ -1,8 +1,8 @@
 # Copyright (C) 2026  Reno Greenleaf
 """Node editor stuff."""
 from qtpy.QtWidgets import QWidget, QLineEdit, QMessageBox, QPushButton
+from qtpy.QtCore import QPointF
 import qtpynodeeditor as ne
-from option import Option as Widget
 
 
 class Boolean(ne.NodeData):
@@ -61,19 +61,7 @@ class Scene(ne.FlowScene):
 			QMessageBox.information(widget, " ", "It's dropped already.")
 			return
 
-		node = self.create_node(Option())
-		node.model.node = node
-		node.model.scene = self
-		node.model.widget = widget
-		node.model.graphics_object = node.graphics_object
-
-		delete = widget.findChild((QPushButton,))
-		description = widget.findChild((QLineEdit,))
-		description.textChanged.connect(node.model.setCaption)
-		delete.clicked.connect(node.model.delete)
-
-		node.graphics_object.setPos(event.scenePos())
-		node.model.setCaption(description.text())
+		self._create_node(widget, event.scenePos())
 
 	def normalize(self):
 		"""Prepare for saving."""
@@ -83,6 +71,28 @@ class Scene(ne.FlowScene):
 			result.append(self._normalize_connection(connection))
 
 		return result
+
+	def denormalize(self, json, relationships):
+		"""Load."""
+		ids = set()
+		x = 50
+		y = 50
+		nodes = {}
+
+		for connection in json['ai']:
+			ids.add(connection['trigger'])
+			ids.add(connection['affected'])
+
+		for identifier in ids:
+			widget = relationships.get('option', identifier)
+			nodes[identifier] = self._create_node(widget, QPointF(x, y))
+			y += 150
+
+		for connection in json['ai']:
+			index = 0 if connection['action'] == 'hide' else 1
+			trigger = nodes[connection['trigger']]
+			affected = nodes[connection['affected']]
+			self.create_connection_by_index(affected, index, trigger, 0, None)
 
 	def _normalize_connection(self, connection):
 		input_, _ = connection.ports
@@ -101,3 +111,20 @@ class Scene(ne.FlowScene):
 		for node in self.iterate_over_nodes():
 			for connection in node.state.output_connections:
 				yield connection
+
+	def _create_node(self, widget, position):
+		node = self.create_node(Option())
+		node.model.node = node
+		node.model.scene = self
+		node.model.widget = widget
+		node.model.graphics_object = node.graphics_object
+
+		delete = widget.findChild((QPushButton,))
+		description = widget.findChild((QLineEdit,))
+		description.textChanged.connect(node.model.setCaption)
+		delete.clicked.connect(node.model.delete)
+
+		node.graphics_object.setPos(position)
+		node.model.setCaption(description.text())
+
+		return node
