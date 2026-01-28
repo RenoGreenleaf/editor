@@ -108,7 +108,8 @@ class Window(widgets.QMainWindow):
 		view = self.findChild((ne.FlowView,))
 		view.scene.denormalize(raw_world, self)
 
-		self.last_id = int(max(raw_world['available'].keys()))
+		ids = map(int, raw_world['available'].keys())
+		self.last_id = max(ids)
 
 	def get(self, key, identifier):
 		"""Retrieve a widget to create a node from it."""

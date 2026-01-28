@@ -65,30 +65,27 @@ class Scene(ne.FlowScene):
 
 	def normalize(self):
 		"""Prepare for saving."""
-		result = []
+		result = {'connections': [], 'nodes': {}}
 
 		for connection in self._iterate_over_connections():
-			result.append(self._normalize_connection(connection))
+			result['connections'].append(self._normalize_connection(connection))
+
+		for node in self.iterate_over_nodes():
+			result['nodes'][node.model.widget.objectName()] = self._normalize_node(node)
 
 		return result
 
 	def denormalize(self, json, relationships):
 		"""Load."""
-		ids = set()
-		x = 50
-		y = 50
 		nodes = {}
 
-		for connection in json['ai']:
-			ids.add(connection['trigger'])
-			ids.add(connection['affected'])
-
-		for identifier in ids:
+		for identifier in json['ai']['nodes']:
 			widget = relationships.get('option', identifier)
-			nodes[identifier] = self._create_node(widget, QPointF(x, y))
-			y += 150
+			raw_node = json['ai']['nodes'][identifier]
+			position = QPointF(raw_node['x'], raw_node['y'])
+			nodes[identifier] = self._create_node(widget, position)
 
-		for connection in json['ai']:
+		for connection in json['ai']['connections']:
 			index = 0 if connection['action'] == 'hide' else 1
 			trigger = nodes[connection['trigger']]
 			affected = nodes[connection['affected']]
@@ -101,6 +98,13 @@ class Scene(ne.FlowScene):
 			'trigger': connection.output_node.model.widget.objectName(),
 			'affected': connection.input_node.model.widget.objectName(),
 			'action': 'show' if input_.index == 1 else 'hide',
+		}
+
+	def _normalize_node(self, node):
+		position = node.graphics_object.scenePos()
+		return {
+			'x': position.x(),
+			'y': position.y()
 		}
 
 	def _iterate_over_widgets(self):
