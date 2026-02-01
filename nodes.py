@@ -45,8 +45,26 @@ class Option(ne.NodeDataModel):
 	def delete(self):
 		self.scene.remove_node(self.node)
 
+	def get_id(self):
+		return self.widget.objectName()
+
+	def bind(self, widget):
+		self.widget = widget
+		delete = widget.findChild((QPushButton,))
+		description = widget.findChild((QLineEdit,))
+		description.textChanged.connect(self.setCaption)
+		delete.clicked.connect(self.delete)
+
+		self.setCaption(description.text())
+
 
 class Conjunction(ne.NodeDataModel):
+
+	def __init__(self, *args, **kwargs):
+		"""Declare custom properties."""
+		super().__init__(*args, **kwargs)
+		self.widget = QWidget()
+
 	name = 'conjunction'
 	port_caption_visible = True
 	port_caption = {
@@ -60,9 +78,19 @@ class Conjunction(ne.NodeDataModel):
 	data_type = Boolean.data_type
 	caption_visible = False
 
+	def get_id(self):
+		return self.objectName()
+
+	def bind(self, widget):
+		pass
+
 
 class Scene(ne.FlowScene):
-	"""Node editor itself."""
+	"""The editor itself."""
+
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.node_created.connect(self._node_created)
 
 	def dragMoveEvent(self, event):
 		"""Accept event. Required for a drag-drop event to work."""
@@ -86,7 +114,7 @@ class Scene(ne.FlowScene):
 			result['connections'].append(self._normalize_connection(connection))
 
 		for node in self.iterate_over_nodes():
-			result['nodes'][node.model.widget.objectName()] = self._normalize_node(node)
+			result['nodes'][node.model.get_id()] = self._normalize_node(node)
 
 		return result
 
@@ -98,10 +126,14 @@ class Scene(ne.FlowScene):
 			widget = relationships.get('option', identifier)
 			raw_node = json['ai']['nodes'][identifier]
 			position = QPointF(raw_node['x'], raw_node['y'])
-			nodes[identifier] = self._create_node(widget, position)
+			model = self.registry.create(raw_node['type'])
+			node = self.create_node(model)
+			node.graphics_object.setPos(position)
+			node.model.bind(widget)
+			nodes[identifier] = node
 
 		for connection in json['ai']['connections']:
-			index = 0 if connection['action'] == 'hide' else 1
+			index = connection['input']
 			trigger = nodes[connection['trigger']]
 			affected = nodes[connection['affected']]
 			self.create_connection_by_index(affected, index, trigger, 0, None)
@@ -110,14 +142,15 @@ class Scene(ne.FlowScene):
 		input_, _ = connection.ports
 
 		return {
-			'trigger': connection.output_node.model.widget.objectName(),
-			'affected': connection.input_node.model.widget.objectName(),
-			'action': 'show' if input_.index == 1 else 'hide',
+			'trigger': connection.output_node.model.get_id(),
+			'affected': connection.input_node.model.get_id(),
+			'input': input_.index,
 		}
 
 	def _normalize_node(self, node):
 		position = node.graphics_object.scenePos()
 		return {
+			'type': node.model.name,
 			'x': position.x(),
 			'y': position.y()
 		}
@@ -131,19 +164,11 @@ class Scene(ne.FlowScene):
 			for connection in node.state.output_connections:
 				yield connection
 
-	def _create_node(self, widget, position):
-		node = self.create_node(Option())
+	def _create_node(self, position):
+		return node
+
+	def _node_created(self, node):
 		node.model.node = node
 		node.model.scene = self
-		node.model.widget = widget
 		node.model.graphics_object = node.graphics_object
-
-		delete = widget.findChild((QPushButton,))
-		description = widget.findChild((QLineEdit,))
-		description.textChanged.connect(node.model.setCaption)
-		delete.clicked.connect(node.model.delete)
-
-		node.graphics_object.setPos(position)
-		node.model.setCaption(description.text())
-
-		return node
+		node.model.setObjectName(node.id)

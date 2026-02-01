@@ -117,7 +117,7 @@ class Window(widgets.QMainWindow):
 		if key != 'option':
 			raise KeyError()
 
-		return self.findChild((Option,), identifier)
+		return self.findChild((Option,), identifier) or widgets.QWidget()
 
 	def unid(self):
 		"""Implement relationships interface."""
