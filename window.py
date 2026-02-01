@@ -33,6 +33,7 @@ class Window(widgets.QMainWindow):
 
 		registry = ne.DataModelRegistry()
 		registry.register_model(nodes.Option)
+		registry.register_model(nodes.Conjunction)
 		scene = nodes.Scene(registry=registry)
 		flow = ne.FlowView(scene)
 		flow.setAcceptDrops(True)

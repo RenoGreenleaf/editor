@@ -6,7 +6,7 @@ import qtpynodeeditor as ne
 
 
 class Boolean(ne.NodeData):
-	"""Required for a node."""
+	"""Required for a nodes ports."""
 
 	data_type = ne.NodeDataType('boolean', 'Boolean')
 
@@ -44,6 +44,21 @@ class Option(ne.NodeDataModel):
 
 	def delete(self):
 		self.scene.remove_node(self.node)
+
+
+class Conjunction(ne.NodeDataModel):
+	name = 'conjunction'
+	port_caption_visible = True
+	port_caption = {
+		'input': {0: 'a', 1: 'b'},
+		'output': {0: '&'}
+	}
+	num_ports = {
+		ne.PortType.input: 2,
+		ne.PortType.output: 1,
+	}
+	data_type = Boolean.data_type
+	caption_visible = False
 
 
 class Scene(ne.FlowScene):
