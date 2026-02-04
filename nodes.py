@@ -104,7 +104,9 @@ class Scene(ne.FlowScene):
 			QMessageBox.information(widget, " ", "It's dropped already.")
 			return
 
-		self._create_node(widget, event.scenePos())
+		node = self.create_node(Option)
+		node.model.bind(widget)
+		node.graphics_object.setPos(event.scenePos())
 
 	def normalize(self):
 		"""Prepare for saving."""
@@ -163,9 +165,6 @@ class Scene(ne.FlowScene):
 		for node in self.iterate_over_nodes():
 			for connection in node.state.output_connections:
 				yield connection
-
-	def _create_node(self, position):
-		return node
 
 	def _node_created(self, node):
 		node.model.node = node
